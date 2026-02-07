@@ -137,13 +137,11 @@ class extract_features():
             planned_correction = np.array(self.filtered_data[ind]["rescaled_correction_timing"])
             post_traj = np.array(self.filtered_data[ind]["entire_pose_list"])[planned_correction + 1:, :3] # +1 for after the last point of the actual traj
             planned_traj = np.concatenate((pre_traj, post_traj), axis=0)
-            if np.array(self.filtered_data[ind]["pre_pose_vel"]).ndim == 1:
-                print(self.filtered_data[ind]["participant_id"], self.filtered_data[ind]["trial_id"], self.filtered_data[ind]["shape"])
-                print(self.filtered_data[ind]["pre_pose_vel"], self.filtered_data[ind]["pre_pose_list"])
-                self.filtered_data[ind]["features"] = False # correction happns immediately
-                # input()
-                continue
-            pre_traj_vel = np.array(self.filtered_data[ind]["pre_pose_vel"])[:,:3]
+            # if np.array(self.filtered_data[ind]["pre_pose_vel"]).ndim == 1:
+            #     self.filtered_data[ind]["features"] = False # correction happns immediately
+            #     # input()
+            #     continue
+            # pre_traj_vel = np.array(self.filtered_data[ind]["pre_pose_vel"])[:,:3]
 
             timestamp = np.array(self.filtered_data[ind]["pre_timestamp"])
             dts0 = timestamp[1:] - timestamp[:-1] # len(pre_traj) - 1
@@ -195,7 +193,8 @@ class extract_features():
                 dis = np.linalg.norm(current_pos - target_pose)
 
                 if i <= pre_traj.shape[0] - 1: # for calculating the v at the transition point as the pos_diff/delta_t
-                    current_velocity = pre_traj_vel[i]
+                    # current_velocity = pre_traj_vel[i]
+                    current_velocity = (pre_traj[i+1] - pre_traj[i])/dts0[0] # use traj itself to cal v
 
                 else:
                     current_velocity = (planned_traj[i+1] - planned_traj[i])/0.3 # Starting velocity
