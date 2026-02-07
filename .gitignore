@@ -1,0 +1,6 @@
+
+# Large data files
+source/data_keys.pkl
+source/corl_data.pkl
+source/rescaled_traj.pkl
+
