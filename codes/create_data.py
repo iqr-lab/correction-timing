@@ -21,7 +21,7 @@ TRAJ_KEYS = [
 # get rid of unused keys
 def pick_keys():
 
-    with open("../source/corl_data.pkl", "rb") as f:
+    with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/corl_data.pkl", "rb") as f:
         obj = pickle.load(f)
 
 
@@ -35,7 +35,7 @@ def pick_keys():
         for d in obj
     ]
 
-    with open('../source/data_keys.pkl', 'wb') as f:
+    with open('../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl', 'wb') as f:
         pickle.dump(data, f)
 
 
@@ -145,9 +145,9 @@ def make_example_data(in_pkl, out_pkl, n_samples=100, seed=42,
 
 if __name__ == "__main__":
 
-    # with open("../source/corl_data.pkl", "rb") as f:
-    # with open("../source/rescaled_traj.pkl", "rb") as f: 
-    # with open("../source/data_keys.pkl", "rb") as f:
+    # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/corl_data.pkl", "rb") as f:
+    # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/rescaled_traj.pkl", "rb") as f: 
+    # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl", "rb") as f:
     with open("../source/example_data.pkl", "rb") as f:
         obj = pickle.load(f)
 
@@ -157,5 +157,6 @@ if __name__ == "__main__":
     print(obj[10]['entire_pose_list'])
 
     # pick_keys()
-    # make_example_data('../source/data_keys.pkl', '../source/example_data.pkl', n_samples=100,
+    # make_example_data('../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl', 
+    #                   '../source/example_data.pkl', n_samples=100,
     #                   noise_type="gaussian", per_traj_offset=False)
