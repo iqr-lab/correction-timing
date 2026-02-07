@@ -11,7 +11,7 @@ class LoadData:
 
 
 
-        with open('/Users/anjiabei/Documents/research/corl_data.pkl', 'rb') as file:
+        with open('../config/example_data.pkl', 'rb') as file:
             self.training_data = pickle.load(file)
         print(len(self.training_data))
 
@@ -47,7 +47,7 @@ class LoadData:
                 # print(index, len(waypoints))
                 self.selected_data[i]['rescaled_correction_timing'] = index
             # indices.append(index)
-        with open('/Users/anjiabei/Documents/research/rescaled_traj.pkl', 'wb') as f:
+        with open('../config/example_data_rescaled.pkl', 'wb') as f:
             pickle.dump(self.selected_data, f)
         # return indices
     

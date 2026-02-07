@@ -25,7 +25,7 @@ class extract_features():
         """
 
         # goal positions
-        with open('../../experiment/config/target_position.yaml','r') as file:
+        with open('../config/target_position.yaml','r') as file:
 
             self.target_position = yaml.safe_load(file)
             
@@ -42,7 +42,7 @@ class extract_features():
 
         # load the data
         # with open('/Users/anjiabei/Documents/research/corl_data.pkl', 'rb') as file:
-        with open('/Users/anjiabei/Documents/research/rescaled_traj.pkl', 'rb') as file:
+        with open('../config/rexample.pkl', 'rb') as file:
             self.training_data = pickle.load(file)
         print(len(self.training_data))
 
@@ -338,7 +338,7 @@ class extract_features():
             self.filtered_data[ind]["features"] = data
             # with open("./features/features_"+str(j)+".pkl", 'wb') as f:
             #     pickle.dump(data, f)
-        with open("/Users/anjiabei/Documents/research/features/corrected_features_"+str(int(100*self.timing_ratio))+".pkl", 'wb') as f:
+        with open("../config/features/corrected_features_"+str(int(100*self.timing_ratio))+".pkl", 'wb') as f:
             pickle.dump(self.filtered_data, f)
 
     def legibliity(self, traj, goal, time):
@@ -579,7 +579,7 @@ class extract_features():
             print(data[1]["a1"], data[1]["time"])
             self.filtered_data[ind]["features"] = data
 
-        with open("/Users/anjiabei/Documents/research/features/uncorrected_features.pkl", 'wb') as f:
+        with open("../config/features/uncorrected_features.pkl", 'wb') as f:
             pickle.dump(self.filtered_data, f)
 
 

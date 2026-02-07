@@ -107,6 +107,22 @@ def sanitize_episode(ep, noise_type="uniform", noise_min=0.01, noise_max=0.1, pe
 
     return new_ep
 
+def balanced_sample_by_corrected(data, n_per_class=100, seed=42):
+    random.seed(seed)
+
+    corrected = [ep for ep in data if ep.get("corrected") is True]
+    uncorrected = [ep for ep in data if ep.get("corrected") is False]
+
+    if len(corrected) < n_per_class:
+        raise ValueError(f"Not enough corrected episodes: {len(corrected)} < {n_per_class}")
+    if len(uncorrected) < n_per_class:
+        raise ValueError(f"Not enough uncorrected episodes: {len(uncorrected)} < {n_per_class}")
+
+    sampled_corrected = random.sample(corrected, n_per_class)
+    sampled_uncorrected = random.sample(uncorrected, n_per_class)
+
+    return sampled_corrected + sampled_uncorrected
+
 def make_example_data(in_pkl, out_pkl, n_samples=100, seed=42,
                       noise_type="uniform", noise_min=0.01, noise_max=0.1,
                       per_traj_offset=True):
@@ -122,14 +138,17 @@ def make_example_data(in_pkl, out_pkl, n_samples=100, seed=42,
     if n_samples > len(data):
         raise ValueError(f"Requested {n_samples} samples but only have {len(data)} entries.")
 
-    idxs = random.sample(range(len(data)), n_samples)
-    sampled = [data[i] for i in idxs]
+    # idxs = random.sample(range(len(data)), n_samples)
+    # sampled = [data[i] for i in idxs]
+    sampled = balanced_sample_by_corrected(data, n_per_class=n_samples, seed=seed)
 
     example = [
         sanitize_episode(ep, noise_type=noise_type, noise_min=noise_min, noise_max=noise_max,
                          per_traj_offset=per_traj_offset)
         for ep in sampled
     ]
+
+    random.shuffle(example)
 
     with open(out_pkl, "wb") as f:
         pickle.dump(example, f)
@@ -145,18 +164,18 @@ def make_example_data(in_pkl, out_pkl, n_samples=100, seed=42,
 
 if __name__ == "__main__":
 
-    # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/corl_data.pkl", "rb") as f:
-    # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/rescaled_traj.pkl", "rb") as f: 
-    # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl", "rb") as f:
-    with open("../source/example_data.pkl", "rb") as f:
-        obj = pickle.load(f)
+    # # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/corl_data.pkl", "rb") as f:
+    # # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/rescaled_traj.pkl", "rb") as f: 
+    # # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl", "rb") as f:
+    # with open("../source/example_data.pkl", "rb") as f:
+    #     obj = pickle.load(f)
 
-    # print(type(obj))
-    print(len(obj))
-    print(obj[0].keys()) # only corrected traj has cor_pose_list
-    print(obj[10]['entire_pose_list'])
+    # # print(type(obj))
+    # print(len(obj))
+    # print(obj[0].keys()) # only corrected traj has cor_pose_list
+    # print(obj[10]['entire_pose_list'])
 
     # pick_keys()
-    # make_example_data('../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl', 
-    #                   '../source/example_data.pkl', n_samples=100,
-    #                   noise_type="gaussian", per_traj_offset=False)
+    make_example_data('../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl', 
+                      '../config/example_data.pkl', n_samples=100,
+                      noise_type="gaussian", per_traj_offset=False)
