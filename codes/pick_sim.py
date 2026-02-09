@@ -18,11 +18,11 @@ class PickSim:
 
         # sim data
         if self.shape == "square":
-            directory = '/Users/anjiabei/Documents/research/simulator/square_0.03/'
+            directory = '../dropping_blocks/simulator/square_0.03/'
         elif self.shape == "circle":
-            directory = '/Users/anjiabei/Documents/research/simulator/circle_0.5/'
+            directory = '../dropping_blocks/simulator/circle_0.5/'
         else:
-            directory = '/Users/anjiabei/Documents/research/simulator/'
+            directory = '../dropping_blocks/simulator/'
 
         total_labels = []
         total_poses = []
@@ -66,8 +66,8 @@ class PickSim:
         real_labels = []
         real_poses = []
         real_indices = []
-        # Directory containing the pickle files
-        filepath = '/Users/anjiabei/Documents/research/real_life_data/validated/'+str(self.shape)+'.pkl'
+        # Directory containing the real life dropping block pickle files
+        filepath = '../dropping_blocks/validated/'+str(self.shape)+'.pkl'
         with open(filepath, 'rb') as file:
             data = pickle.load(file)
 

@@ -161,21 +161,42 @@ def make_example_data(in_pkl, out_pkl, n_samples=100, seed=42,
         if e0.get(k):
             print(k, "T=", len(e0[k]), "dim=", len(e0[k][0]))
 
+# get rid of the velocity key
+def no_vel():
+
+    with open("../config/example_data_rescaled.pkl", "rb") as f:
+        obj = pickle.load(f)
+
+
+    KEYS_TO_KEEP = ['shape', 'target',  'success', 'corrected', 
+                    'pre_pose_list', 'pre_timestamp', 
+                    'correction_pose_list', 'fake_correction', 'post_pose_list',  'entire_pose_list'
+    ]
+
+    data = [
+        {k: d[k] for k in KEYS_TO_KEEP if k in d}
+        for d in obj
+    ]
+
+    with open('../config/example_data_rescaled.pkl', 'wb') as f:
+        pickle.dump(data, f)
+
 
 if __name__ == "__main__":
 
     # # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/corl_data.pkl", "rb") as f:
     # # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/rescaled_traj.pkl", "rb") as f: 
     # # with open("../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl", "rb") as f:
-    # with open("../source/example_data.pkl", "rb") as f:
-    #     obj = pickle.load(f)
+    with open("../config/example_data_rescaled.pkl", "rb") as f:
+        obj = pickle.load(f)
 
-    # # print(type(obj))
-    # print(len(obj))
-    # print(obj[0].keys()) # only corrected traj has cor_pose_list
+    # print(type(obj))
+    print(len(obj))
+    print(obj[0].keys()) # only corrected traj has cor_pose_list
     # print(obj[10]['entire_pose_list'])
 
     # pick_keys()
-    make_example_data('../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl', 
-                      '../config/example_data.pkl', n_samples=100,
-                      noise_type="gaussian", per_traj_offset=False)
+    # make_example_data('../../enhancing_goal_inference_via_correction_timing_codes_data_source/data_keys.pkl', 
+    #                   '../config/example_data.pkl', n_samples=100,
+    #                   noise_type="gaussian", per_traj_offset=False)
+    # no_vel()

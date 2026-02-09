@@ -19,7 +19,7 @@ class GroundTruthGMM:
         self.shape = shape
 
         # sim data
-        directory = '/Users/anjiabei/Documents/research/simulator/best/'
+        directory = '../dropping_blocks/simulator/best/'
 
         # total_labels = []
         # total_poses = []
@@ -81,7 +81,7 @@ class GroundTruthGMM:
         ax.set_zlabel("Z")
         ax.set_title("Data Points Colored by 3D GMM Density")
         plt.show()
-        joblib.dump(gmm_3d, f'./goal_infer_files/gmm_uwhere_model_ground_truth_{self.shape}.pkl') # this was later moved to the ground truth folder.
+        joblib.dump(gmm_3d, f'../goal_infer_files/gmms/ground_truth/gmm_uwhere_model_ground_truth_{self.shape}.pkl') # this was later moved to the ground truth folder.
 
 
     def plot_xy_gmm_at_z0(self, n_grid=11):

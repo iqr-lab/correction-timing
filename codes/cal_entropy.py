@@ -14,9 +14,15 @@ import random
 class entropy:
     def __init__(self, shape):
 
+        self.shape = shape
 
-        # Directory containing the pickle files
-        directory = '/Users/anjiabei/Documents/research/simulator/square_0.03'
+        # sim data
+        if self.shape == "square":
+            directory = '../dropping_blocks/simulator/square_0.03/'
+        elif self.shape == "circle":
+            directory = '../dropping_blocks/simulator/circle_0.5/'
+        else:
+            directory = '../dropping_blocks/simulator/'
 
         total_labels = []
         total_poses = []
@@ -49,7 +55,7 @@ class entropy:
         self.num_datasets = self.labels.shape[0]
         self.N = self.labels.shape[1]
         print(self.num_datasets, self.N)
-        input()
+        # input()
 
         self.cal_prob()
 
@@ -316,27 +322,27 @@ if __name__ == "__main__":
 
 
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
 
-    # Plot all poses
-    for pose in sample_data:
-        pose[2] = 0.08
-        position = np.array(pose[:3])
-        euler_angles = np.array(pose[3:])
-        ent.plot_pose(ax, position, euler_angles)
+    # # Plot all poses
+    # for pose in sample_data:
+    #     pose[2] = 0.08
+    #     position = np.array(pose[:3])
+    #     euler_angles = np.array(pose[3:])
+    #     ent.plot_pose(ax, position, euler_angles)
 
-    # position = np.zeros(3)
-    # euler_angles = np.array([np.pi/2, 0, np.pi/2])
-    # ent.plot_pose(ax, position, euler_angles)
+    # # position = np.zeros(3)
+    # # euler_angles = np.array([np.pi/2, 0, np.pi/2])
+    # # ent.plot_pose(ax, position, euler_angles)
 
-    # Set labels
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
+    # # Set labels
+    # ax.set_xlabel('X')
+    # ax.set_ylabel('Y')
+    # ax.set_zlabel('Z')
 
-    # Display plot
-    plt.show()
+    # # Display plot
+    # plt.show()
 
     data = []
     for i in range(sample_data.shape[0]):
@@ -350,7 +356,7 @@ if __name__ == "__main__":
     print(data[1]["pose"], data[1]["index"])
     print(data[2]["pose"], data[2]["index"])
     print(data[3]["pose"], data[3]["index"])
-    with open("./samples_"+args.shape+".pkl", 'wb') as f:
+    with open("../dropping_blocks/samples/samples_"+args.shape+".pkl", 'wb') as f:
         pickle.dump(data, f)
     # # f1, index = ent.f1_score()
     # # print(f1, index)
