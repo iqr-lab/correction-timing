@@ -194,7 +194,7 @@ class extract_features():
 
                 if i <= pre_traj.shape[0] - 1: # for calculating the v at the transition point as the pos_diff/delta_t
                     # current_velocity = pre_traj_vel[i]
-                    current_velocity = (pre_traj[i+1] - pre_traj[i])/dts0[0] # use traj itself to cal v
+                    current_velocity = (planned_traj[i+1] - planned_traj[i])/dts0[0] # use traj itself to cal v
 
                 else:
                     current_velocity = (planned_traj[i+1] - planned_traj[i])/0.3 # Starting velocity

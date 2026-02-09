@@ -1,0 +1,6 @@
+Example data that can be used to generate results using the codes. 100 trajectories with corrections and 100 trajectories without corrections.
+
+To extract features from the data, run:
+Python3 extract_features.py -c True -tr 0.7
+-c True for corrected data, False for uncorrected data (run -tr = 1 for uncorrected data)
+-tr 0.n for the timing ratio of the data 

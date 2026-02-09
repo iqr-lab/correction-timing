@@ -42,7 +42,7 @@ class extract_features():
 
         # load the data
         # with open('/Users/anjiabei/Documents/research/corl_data.pkl', 'rb') as file:
-        with open('../config/rexample.pkl', 'rb') as file:
+        with open('../config/example_data_rescaled.pkl', 'rb') as file:
             self.training_data = pickle.load(file)
         print(len(self.training_data))
 
@@ -64,7 +64,7 @@ class extract_features():
     def get_training_data(self, corrected):
 
         print(corrected)
-        input()
+        # input()
 
         selected_data = []
         for i in range(len(self.training_data)):
@@ -91,7 +91,7 @@ class extract_features():
                 self.filtered_data.append(self.selected_data[ind])
         print("total corrected data ", len(self.selected_data))
         print("filtered data ", len(self.filtered_data))
-        input()
+        # input()
 
     def filter_data_uncorrected(self):
 
@@ -99,7 +99,7 @@ class extract_features():
 
         self.filtered_data = self.selected_data
         print(len(self.filtered_data))
-        input()
+        # input()
 
 
     def normalized_dot_product(self, v1, v2):
@@ -194,7 +194,7 @@ class extract_features():
 
                 if i <= pre_traj.shape[0] - 1: # for calculating the v at the transition point as the pos_diff/delta_t
                     # current_velocity = pre_traj_vel[i]
-                    current_velocity = (pre_traj[i+1] - pre_traj[i])/dts0[0] # use traj itself to cal v
+                    current_velocity = (planned_traj[i+1] - planned_traj[i])/dts0[0] # use traj itself to cal v, first part of traj
                 else:
                     current_velocity = (planned_traj[i+1] - planned_traj[i])/0.3 # Starting velocity
                 if i == 0:
@@ -297,12 +297,12 @@ class extract_features():
                 del time[pre_traj.shape[0] - 1]
 
 
-            plt.figure(figsize=(8, 6))
-            plt.plot(time, acc)
-            plt.axvline(x=correction_timing, color='r', linestyle='--', label="Correction")
-            # plt.savefig('/Users/anjiabei/Documents/research/figures/pid_planning/'+str(ind)+'_a2.png')
-            print(self.filtered_data[ind]["legi"], self.filtered_data[ind]["success"])
-            plt.show()
+            # plt.figure(figsize=(8, 6))
+            # plt.plot(time, acc)
+            # plt.axvline(x=correction_timing, color='r', linestyle='--', label="Correction")
+            # # plt.savefig('/Users/anjiabei/Documents/research/figures/pid_planning/'+str(ind)+'_a2.png')
+            # # print(self.filtered_data[ind]["legi"], self.filtered_data[ind]["success"])
+            # plt.show()
 
             # plt.figure(figsize=(8, 6))
             # plt.plot(time, alignment_3)
@@ -338,7 +338,7 @@ class extract_features():
             self.filtered_data[ind]["features"] = data
             # with open("./features/features_"+str(j)+".pkl", 'wb') as f:
             #     pickle.dump(data, f)
-        with open("../config/features/corrected_features_"+str(int(100*self.timing_ratio))+".pkl", 'wb') as f:
+        with open("../features/corrected_features_"+str(int(100*self.timing_ratio))+".pkl", 'wb') as f:
             pickle.dump(self.filtered_data, f)
 
     def legibliity(self, traj, goal, time):
@@ -438,15 +438,14 @@ class extract_features():
                 continue
             planned_traj = np.array(self.filtered_data[ind]["pre_pose_list"])[:,:3]
 
-            if np.array(self.filtered_data[ind]["pre_pose_vel"]).ndim == 1:
-                print(self.filtered_data[ind]["participant_id"], self.filtered_data[ind]["trial_id"], self.filtered_data[ind]["shape"])
-                print(self.filtered_data[ind]["pre_pose_vel"], self.filtered_data[ind]["pre_pose_list"])
-                self.filtered_data[ind]["features"] = False
-                # input()
-                continue
-            pre_traj_vel = np.array(self.filtered_data[ind]["pre_pose_vel"])[:,:3]
+            # if np.array(self.filtered_data[ind]["pre_pose_vel"]).ndim == 1:
+            #     print(self.filtered_data[ind]["participant_id"], self.filtered_data[ind]["trial_id"], self.filtered_data[ind]["shape"])
+            #     print(self.filtered_data[ind]["pre_pose_vel"], self.filtered_data[ind]["pre_pose_list"])
+            #     self.filtered_data[ind]["features"] = False
+            #     # input()
+            #     continue
+            # pre_traj_vel = np.array(self.filtered_data[ind]["pre_pose_vel"])[:,:3]
             # current_pos = np.array([0.0, 0.0, 0.0])  # Starting position
-            print("participant id ",self.filtered_data[ind]["participant_id"])
 
             timestamp = np.array(self.filtered_data[ind]["pre_timestamp"])
             dts0 = timestamp[1:] - timestamp[:-1]
@@ -487,12 +486,14 @@ class extract_features():
 
                 dis = np.linalg.norm(current_pos - target_pose)
 
-                current_velocity = pre_traj_vel[i]
+                # current_velocity = pre_traj_vel[i] # don't have this key in the example data
 
                 if i == 0:
+                    current_velocity = np.zeros([3]) # assume 0 for the start
                     current_acceleration = (current_velocity - prev_velocity)/dts0[0] # off by one compared to v, its the one for the timestep before
                     current_jerk = (current_acceleration - prev_acceleration)/dts0[0]
                 else:
+                    current_velocity = (planned_traj[i] - planned_traj[i-1])/(time[i] - time[i-1]) # use traj itself to cal v
                     current_acceleration = (current_velocity - prev_velocity)/(time[i] - time[i-1]) # off by 1 compared to v
                     current_jerk = (current_acceleration - prev_acceleration)/(time[i] - time[i-1])
 
@@ -579,7 +580,7 @@ class extract_features():
             print(data[1]["a1"], data[1]["time"])
             self.filtered_data[ind]["features"] = data
 
-        with open("../config/features/uncorrected_features.pkl", 'wb') as f:
+        with open("../features/uncorrected_features.pkl", 'wb') as f:
             pickle.dump(self.filtered_data, f)
 
 
