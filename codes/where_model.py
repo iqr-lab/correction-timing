@@ -35,8 +35,7 @@ def load_data(timing_ratio, split, rep):
 
     for target in target_nums:
         for shape in shapes:
-            # filename = f'/Users/anjiabei/Documents/research/features/splits/indices_{int(100*timing_ratio)}_{int(100*split)}_shape_{shape}_target_{int(target)}.pkl'
-            filename = f'/Users/anjiabei/Documents/research/features/splits/repeats/indices_{int(100*timing_ratio)}_{int(100*split)}_shape_{shape}_target_{int(target)}_{int(rep)}.pkl'
+            filename = f'../splits/indices_{int(100*timing_ratio)}_{int(100*split)}_shape_{shape}_target_{int(target)}_{int(rep)}.pkl'
             
             with open(filename, 'rb') as f:
                 idx_dict = pickle.load(f)
@@ -45,7 +44,7 @@ def load_data(timing_ratio, split, rep):
             val_idx_all.extend(idx_dict["val"])
             test_idx_all.extend(idx_dict["test"])
 
-    with open('/Users/anjiabei/Documents/research/features/corrected_features_'+str(int(100*timing_ratio))+'.pkl', 'rb') as file:
+    with open('../features/corrected_features_'+str(int(100*timing_ratio))+'.pkl', 'rb') as file:
         all_data_pre = pickle.load(file)
     all_data = filter_data(all_data_pre)  # corrected data has features = False, needs to be filtered before indexing
 
@@ -241,8 +240,6 @@ def main():
     parser.add_argument("-m", "--mode", type=str, choices=["train", "inference"], default="train", help="Run mode")
     parser.add_argument("-e", "--epochs", type=int, default=300, help="Number of training epochs")
     parser.add_argument("-l", "--lr", type=float, default=1e-3, help="Learning rate")
-    # parser.add_argument("-sp", "--save_path", type=str, default="/Users/anjiabei/Documents/research/natural-feedback/data_processing/gmm/goal_infer_files/where_infer_model.pt", help="Model save path")
-    # parser.add_argument("-d", "--data", type=str, default="/home/shuangge/Downloads/corl_data.pkl", help="Path to dataset")
     parser.add_argument('-tr','--timing_ratio', type = float)
     parser.add_argument('-s','--split', type = float) # percentage for training
     parser.add_argument('-r','--repeat', type = int)
@@ -250,7 +247,7 @@ def main():
     args = parser.parse_args()
 
     train_x, train_y, val_x, val_y, test_x, test_y = load_data(args.timing_ratio, args.split, args.repeat)
-    save_path = f"/Users/anjiabei/Documents/research/natural-feedback/data_processing/gmm/goal_infer_files/where_infer/model_{str(int(100*args.timing_ratio))}_{str(int(100*args.split))}_{str(int(args.repeat))}.pt"
+    save_path = f"../goal_infer_files/where_infer/model_{str(int(100*args.timing_ratio))}_{str(int(100*args.split))}_{str(int(args.repeat))}.pt"
 
     if args.mode == "train":
         train_model(train_x, train_y, val_x, val_y, args.epochs, args.lr, save_path, args.repeat)

@@ -4,11 +4,7 @@ import numpy as np
 # adding a key to the data to match where the correction happened for the pre-planned data
 
 class LoadData:
-    def __init__(self, shape, legi = "legible", comp = "high"):
-
-
-        self.shape = shape
-
+    def __init__(self):
 
 
         with open('../config/example_data.pkl', 'rb') as file:
@@ -46,6 +42,8 @@ class LoadData:
                     print(dis)
                 # print(index, len(waypoints))
                 self.selected_data[i]['rescaled_correction_timing'] = index
+                print(self.selected_data[i]['rescaled_correction_timing'] )
+                print(self.selected_data[i].keys())
             # indices.append(index)
         with open('../config/example_data_rescaled.pkl', 'wb') as f:
             pickle.dump(self.selected_data, f)
@@ -57,6 +55,6 @@ class LoadData:
 
 if __name__ == "__main__":
 
-    ld = LoadData(shape = "triangle")
+    ld = LoadData()
 
     ld.remapping()

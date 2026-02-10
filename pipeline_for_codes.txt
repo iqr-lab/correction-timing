@@ -1,4 +1,7 @@
-Example data that can be used to generate results using the codes. 100 trajectories with corrections and 100 trajectories without corrections.
+Example data that can be used to generate results using the codes. 800 trajectories (50 data points for 4 shapes and 4 targets) with corrections and 800 trajectories without corrections to match with real data.
+
+Adding correction timing to pre-planned trajectories:
+python3 rescaled_correction_timing.py
 
 To extract features from the data, run:
 python3 extract_features.py -c True -tr 0.7
@@ -14,3 +17,15 @@ python3 pick_sim.py -s shape
 
 To get the gmms for ground truth derived from poses of simulator data from simulators that are the closest to the real life, run
 best_sim_gmm.py -s shape
+
+To generate split data by indices for training(60%)/validating(10%)/testing(30%) for both when and where and combined model, run
+python3 split_data.py -tr 0.7(0.7-1 timing_datio) -split 0.6(how much training set is) -tg 0 (0-3 target) -s shape -r 0 (0-9 different splits)
+Can run bash tasklist.sh to include all different conditions.
+
+To train model to infer where people leave the gripper based on where they grasp it, run:
+python3 where_model.py -s 0.6(split) -tr 0.7 -r 0
+Can run bash tasklist_where_infer.sh to include all different conditions.
+
+To get the gmm models of p(where people leave the gripper/goal), run:
+python3 gmm_training.py -tr timing ratio -s 0.6 -r 0 
+Can run bash tasklist_gmm.sh to include all different conditions.

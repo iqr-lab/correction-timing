@@ -41,7 +41,6 @@ class extract_features():
         self.gs = {'circle':c_gs,'square':s_gs,'triangle':t_gs,'rectangle':r_gs}
 
         # load the data
-        # with open('/Users/anjiabei/Documents/research/corl_data.pkl', 'rb') as file:
         with open('../config/example_data_rescaled.pkl', 'rb') as file:
             self.training_data = pickle.load(file)
         print(len(self.training_data))
@@ -146,8 +145,15 @@ class extract_features():
             #     # input()
             #     continue
             # pre_traj_vel = np.array(self.filtered_data[ind]["pre_pose_vel"])[:,:3]
+            if len(self.filtered_data[ind]["pre_timestamp"]) == 1:
+                print(self.filtered_data[ind]["pre_timestamp"])
+                self.filtered_data[ind]["features"] = False # correction happns immediately
+                # input()
+                continue
+            
 
             timestamp = np.array(self.filtered_data[ind]["pre_timestamp"])
+            # print(timestamp)
             dts0 = timestamp[1:] - timestamp[:-1] # len(pre_traj) - 1
 
             # Define the time step for integration
@@ -194,6 +200,8 @@ class extract_features():
 
                 if i <= pre_traj.shape[0] - 1: # for calculating the v at the transition point as the pos_diff/delta_t
                     # current_velocity = pre_traj_vel[i]
+                    # print(dts0)
+                    # print(timestamp)
                     current_velocity = (planned_traj[i+1] - planned_traj[i])/dts0[0] # use traj itself to cal v, first part of traj
                 else:
                     current_velocity = (planned_traj[i+1] - planned_traj[i])/0.3 # Starting velocity
@@ -430,12 +438,12 @@ class extract_features():
             pid_controller.set_target_pose(target_pose)
 
             # Define the initial position and velocity of the end effector
-            if np.array(self.filtered_data[ind]["pre_pose_list"]).ndim == 1:
-                print(self.filtered_data[ind]["participant_id"], self.filtered_data[ind]["trial_id"], self.filtered_data[ind]["shape"])
-                print(self.filtered_data[ind]["pre_pose_vel"], self.filtered_data[ind]["pre_pose_list"])
-                self.filtered_data[ind]["features"] = False
-                # input()
-                continue
+            # if np.array(self.filtered_data[ind]["pre_pose_list"]).ndim == 1:
+            #     print(self.filtered_data[ind]["participant_id"], self.filtered_data[ind]["trial_id"], self.filtered_data[ind]["shape"])
+            #     print(self.filtered_data[ind]["pre_pose_vel"], self.filtered_data[ind]["pre_pose_list"])
+            #     self.filtered_data[ind]["features"] = False
+            #     # input()
+            #     continue
             planned_traj = np.array(self.filtered_data[ind]["pre_pose_list"])[:,:3]
 
             # if np.array(self.filtered_data[ind]["pre_pose_vel"]).ndim == 1:

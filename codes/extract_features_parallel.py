@@ -30,7 +30,6 @@ class extract_features():
         """
 
         # goal positions
-        # with open('../../experiment/config/target_position.yaml','r') as file:
         with open('./target_position.yaml','r') as file:
 
             self.target_position = yaml.safe_load(file)
@@ -70,7 +69,7 @@ class extract_features():
         selected_data = []
         for i in range(len(data)):
             # if data[i]["comp"].strip() == str(self.comp).strip() and data[i]["features"] != False:
-            if data[i]["features"] != False: # important for training
+            if data[i]["features"] != False: # important for training, won't read these points in the future
                 selected_data.append(data[i])
         print(len(selected_data))
         # input()
@@ -142,6 +141,11 @@ class extract_features():
             #     # input()
             #     continue
             # pre_traj_vel = np.array(self.filtered_data[ind]["pre_pose_vel"])[:,:3]
+            if len(self.filtered_data[ind]["pre_timestamp"]) == 1:
+                print(self.filtered_data[ind]["pre_timestamp"])
+                self.filtered_data[ind]["features"] = False # correction happns immediately
+                # input()
+                continue
 
             timestamp = np.array(self.filtered_data[ind]["pre_timestamp"])
             dts0 = timestamp[1:] - timestamp[:-1] # len(pre_traj) - 1

@@ -49,7 +49,7 @@ class gmm_training():
         """
 
         # goal positions
-        with open('../../experiment/config/target_position.yaml','r') as file:
+        with open('../config/target_position.yaml','r') as file:
 
             self.target_position = yaml.safe_load(file)
             
@@ -78,7 +78,7 @@ class gmm_training():
 
         for target in target_nums:
             for shape in shapes:
-                filename = f'/Users/anjiabei/Documents/research/features/splits/repeats/indices_{int(100*self.timing_ratio)}_{int(100*self.split)}_shape_{shape}_target_{int(target)}_{str(int(self.rep))}.pkl'
+                filename = f'../splits/indices_{int(100*self.timing_ratio)}_{int(100*self.split)}_shape_{shape}_target_{int(target)}_{str(int(self.rep))}.pkl'
                 
                 with open(filename, 'rb') as f:
                     idx_dict = pickle.load(f)
@@ -87,7 +87,7 @@ class gmm_training():
                 test_idx_all.extend(idx_dict["test"])
 
 
-        with open('/Users/anjiabei/Documents/research/features/corrected_features_'+str(int(100*self.timing_ratio))+
+        with open('../features/corrected_features_'+str(int(100*self.timing_ratio))+
                   '.pkl', 'rb') as file:
             all_data_pre = pickle.load(file)
         all_data = self.filter_data(all_data_pre)  # corrected data has features = False, needs to be filtered before indexing
@@ -133,7 +133,7 @@ class gmm_training():
         # --- Compute joint densities for each data point ---
         densities = np.exp(gmm_3d.score_samples(u_wheres))  # shape: (N,)
 
-        joblib.dump(gmm_3d, './goal_infer_files/gmms/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
+        joblib.dump(gmm_3d, '../goal_infer_files/gmms/leaving/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
 
     # def uwhere_dist_grabbing(self): # where people grab the gripper + future projection
     #     u_wheres = []
