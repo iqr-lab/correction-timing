@@ -19,7 +19,7 @@ To get the gmms for ground truth derived from poses of simulator data from simul
 best_sim_gmm.py -s shape
 
 To generate split data by indices for training(60%)/validating(10%)/testing(30%) for both when and where and combined model, run
-python3 split_data.py -tr 0.7(0.7-1 timing_datio) -split 0.6(how much training set is) -tg 0 (0-3 target) -s shape -r 0 (0-9 different splits)
+python3 split_data.py -tr 0.7(0.7-1 timing_ratio) -split 0.6(how much training set is) -tg 0 (0-3 target) -s shape -r 0 (0-9 different splits)
 Can run bash tasklist.sh to include all different conditions.
 
 To train model to infer where people leave the gripper based on where they grasp it, run:
@@ -29,3 +29,15 @@ Can run bash tasklist_where_infer.sh to include all different conditions.
 To get the gmm models of p(where people leave the gripper/goal), run:
 python3 gmm_training.py -tr timing ratio -s 0.6 -r 0 
 Can run bash tasklist_gmm.sh to include all different conditions.
+
+To extract features based on different sampled goals, run 
+python3 extract_features_xysampling.py -tr (0.7-1) -x x_offset -y y_offset
+Can run python3 generate_tasklist.py to generate task list files to include all different conditions (change the sample space size and definition based on needs), and run bash tasklist_feature_offset.sh
+
+To train transformer based on all features to infer when a correction happens, run 
+python3 transformer_training_all_feature.py -s 0.6 -tr {tr} -r {i} 
+Can run bash tasklist_transformer.sh to include all different conditions.
+
+To train transformer based on Boltzmann feature to infer when a correction happens, run 
+python3 transformer_bol.py -s 0.6 -tr {tr} -r {i} 
+Can run bash tasklist_transformer_bol.sh to include all different conditions.

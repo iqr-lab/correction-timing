@@ -332,5 +332,5 @@ if __name__ == "__main__":
     #     noise_type="gaussian",   # or "gaussian"
     #     noise_min=0.01,
     #     noise_max=0.1,
-    #     per_traj_offset=False,   # realistic constant offset per trajectory
+    #     per_traj_offset=False,   # offset for each waypoint
     # )

@@ -61,7 +61,7 @@ class transformer_train:
         for target in target_nums:
             for shape in shapes:
                 # filename = f'/Users/anjiabei/Documents/research/features/splits/indices_{int(100*self.timing_ratio)}_{int(100*self.split)}_shape_{shape}_target_{int(target)}.pkl'
-                filename = f'./splits/repeats/indices_{int(100*self.timing_ratio)}_{int(100*self.split)}_shape_{shape}_target_{int(target)}_{int(self.rep)}.pkl'
+                filename = f'../splits/indices_{int(100*self.timing_ratio)}_{int(100*self.split)}_shape_{shape}_target_{int(target)}_{int(self.rep)}.pkl'
                 
                 with open(filename, 'rb') as f:
                     idx_dict = pickle.load(f)
@@ -71,7 +71,7 @@ class transformer_train:
                 test_idx_all.extend(idx_dict["test"])
 
 
-        with open('./corrected_features_'+str(int(100*self.timing_ratio))+'.pkl', 'rb') as file:
+        with open('../features/corrected_features_'+str(int(100*self.timing_ratio))+'.pkl', 'rb') as file:
             all_data_pre = pickle.load(file)
         all_data = self.filter_data(all_data_pre)  # corrected data has features = False, needs to be filtered before indexing
 
@@ -83,7 +83,7 @@ class transformer_train:
         self.test_data = test_data
 
 
-        with open('./uncorrected_features.pkl', 'rb') as file:
+        with open('../features/uncorrected_features.pkl', 'rb') as file:
             uncorrected_data_pre = pickle.load(file)
         uncorrected_data = self.filter_data(uncorrected_data_pre)
 
@@ -606,7 +606,7 @@ class transformer_train:
 
         # --- Callbacks ---
         checkpoint = tf.keras.callbacks.ModelCheckpoint(
-                filepath=f'best_transformer_d_model_{str(int(100*self.timing_ratio))}_{str(int(self.rep))}_{str(int(self.de))}.keras',  # can end in .keras
+                filepath=f'../goal_infer_files/when_weights/temp_models/best_transformer_d_model_{str(int(100*self.timing_ratio))}_{str(int(self.rep))}_{str(int(self.de))}.keras',  # can end in .keras
                 save_weights_only=False,                  # save the full model
                 monitor='val_loss',
                 mode='min',
@@ -627,8 +627,8 @@ class transformer_train:
         )
 
         # --- Load best weights ---
-        model.load_weights(f'best_transformer_d_model_{str(int(100*self.timing_ratio))}_{str(int(self.rep))}_{str(int(self.de))}.keras')
-        model.save_weights('./model_weights_ablation_com/transformer_all_'+str(int(100*self.timing_ratio))+'_'+str(int(self.rep))+'_'+str(int(self.de))+'.h5')
+        model.load_weights(f'../goal_infer_files/when_weights/temp_models/best_transformer_d_model_{str(int(100*self.timing_ratio))}_{str(int(self.rep))}_{str(int(self.de))}.keras')
+        model.save_weights('../goal_infer_files/when_weights/model_weights_ablation/transformer_all_'+str(int(100*self.timing_ratio))+'_'+str(int(self.rep))+'_'+str(int(self.de))+'.weights.h5')
 
         return model
     
@@ -750,5 +750,5 @@ if __name__ == "__main__":
     tt = transformer_train(timing_ratio=args.timing_ratio, split = args.split, rep = args.repeat, de = args.delete)
     model = tt.training_transformer_masked_with_val()
     results = tt.testing(model)
-    with open(f"./results/evaluation_ablation_com/"+str(int(100*args.timing_ratio))+'_'+str(int(100*args.split))+'_'+str(int(args.repeat))+'_'+str(int(args.delete))+".pkl", "wb") as f:
+    with open(f"../results/evaluation_ablation/"+str(int(100*args.timing_ratio))+'_'+str(int(100*args.split))+'_'+str(int(args.repeat))+'_'+str(int(args.delete))+".pkl", "wb") as f:
         pickle.dump(results, f)

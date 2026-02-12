@@ -56,14 +56,14 @@
 # # train transformer 50 times
 # with open('tasklist_transformer.sh','w') as file:
 #     for tr in [0.7, 0.8, 0.9, 1]:
-#         for i in range(200):
-#             file.write(f'python3 transformer_training_para.py -s 0.6 -tr {tr} -r {i} \n')
+#         for i in range(10):
+#             file.write(f'python3 transformer_training_all_feature.py -s 0.6 -tr {tr} -r {i} \n')
 
-# # train transformer (boltzmann) 50 times
-# with open('tasklist_transformer_bol.sh','w') as file:
-#     for tr in [0.7, 0.8, 0.9, 1]:
-#         for i in range(200):
-#             file.write(f'python3 transformer_bol_para.py -s 0.6 -tr {tr} -r {i} \n')
+# train transformer (boltzmann) 50 times
+with open('tasklist_transformer_bol.sh','w') as file:
+    for tr in [0.7, 0.8, 0.9, 1]:
+        for i in range(10):
+            file.write(f'python3 transformer_bol.py -s 0.6 -tr {tr} -r {i} \n')
 
 # # ablation
 # with open('tasklist_transformer_ablation.sh','w') as file:
@@ -87,11 +87,11 @@
 #                 file.write(f'python3 load_weights_ablation.py -s 0.6 -tr {tr} -r {i} -d {j} \n')
 
 
-# train gmm on 50 different splits
-with open('tasklist_gmm.sh','w') as file:
-    for tr in [0.7, 0.8, 0.9, 1]:
-        for i in range(10):
-            file.write(f'python3 gmm_training.py -s 0.6 -tr {tr} -r {i} \n')
+# # train gmm on 50 different splits
+# with open('tasklist_gmm.sh','w') as file:
+#     for tr in [0.7, 0.8, 0.9, 1]:
+#         for i in range(10):
+#             file.write(f'python3 gmm_training.py -s 0.6 -tr {tr} -r {i} \n')
 
 
 # # train gmm on 50 different splits
