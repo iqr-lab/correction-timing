@@ -34,9 +34,13 @@ config/example_data_rescaled.pkl
 python3 extract_features.py -c {corrected} -tr {timing ratio}
 ```
 Arguments
+
 -c True → corrected data
+
 -c False → uncorrected data (use -tr 1 for uncorrected)
+
 -tr 0.n → timing ratio (0.7-1)
+
 Output directory:
 ```bash
 features/
@@ -78,10 +82,15 @@ Generate train(60%)/validation(10%)/test(30%) splits:
 python3 split_data.py -s {split} -tr {timing ratio} -sh {shape} -tg {target} -r {rep}
 ```
 Arguments
+
 -tr → timing ratio (0.7–1)
+
 -s → training fraction of the splits (in our project s = 0.6)
+
 -tg → target index (0–3)
+
 -sh → shape
+
 -r → repetition index (0–9), corresponds to the splits
 
 Run all conditions:
@@ -174,6 +183,7 @@ Extract features for sampled goal offsets:
 python3 extract_features_xysampling.py -tr {timing ratio} -x {x_offset} -y {y_offset}
 ```
 -x → x offset that can be defined by desired sample space and resolution
+
 -y → y offset that can be defined by desired sample space and resolution
 
 Generate task lists:
@@ -193,7 +203,9 @@ Compute KLD between ground truth and: **PWHEN, PWHERE, PCOMBINED**
 python3 goal_infer.py -s {split = 0.6} -tr {timing ratio} -sh {shape} -tg {target} -r {rep} -t {type}
 ```
 Arguments
+
 -t grasp → infer release from grasp and infer goal
+
 -t release → infer goal from release
 
 Run all conditions:
