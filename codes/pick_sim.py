@@ -151,7 +151,7 @@ class PickSim:
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s','--shape', type = str)
+    parser.add_argument('-sh','--shape', type = str)
 
     args = parser.parse_args()
 

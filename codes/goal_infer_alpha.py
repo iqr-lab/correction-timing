@@ -35,10 +35,9 @@ import bz2
 
 # goal infer but testing how different weights of pwhere and pwhen (alpha) affect goal infer accuracy.
 class pgoal():
-    def __init__(self, timing_ratio, split, target, shape, rep, alpha):
+    def __init__(self, timing_ratio, split, target, shape, rep, alpha, t):
 
         # goal positions
-        # with open('../../experiment/config/target_position.yaml','r') as file:
         with open('./target_position.yaml','r') as file:
 
             self.target_position = yaml.safe_load(file)
@@ -57,7 +56,6 @@ class pgoal():
 
 
         all_pdfs = []       # list of lists, outer: goals, inner: trajectories
-        # all_pdfs_ground = []
         all_puwhens = []   # same structure
         sampled_goals = []  # list of sampled goal offsets
 
@@ -67,75 +65,59 @@ class pgoal():
         self.shape = shape
         self.rep = rep
         self.alpha = alpha
+        self.t = t
 
-        # with open('/Users/anjiabei/Documents/research/features/splits/repeats/indices_'+str(int(100*self.timing_ratio))+
-        #           '_'+str(int(100*self.split))+'_shape_'+str(self.shape)+'_target_'+str(self.target)+'_'+str(int(self.rep))+'.pkl', 'rb') as f:  # shape and target
-        with open('./splits/repeats/indices_'+str(int(100*self.timing_ratio))+
+
+        with open('../splits/indices_'+str(int(100*self.timing_ratio))+
                   '_'+str(int(100*self.split))+'_shape_'+str(self.shape)+'_target_'+str(self.target)+'_'+str(int(self.rep))+'.pkl', 'rb') as f:  # shape and target
             idx_dict = pickle.load(f)
         train_idx = idx_dict["train"]
         test_idx = idx_dict["test"]
         print("train length =", len(train_idx), " test length =", len(test_idx))
 
-        # temp_dir = "/Users/anjiabei/Documents/research/features/sampled/temp_features"
-        # traj_file = os.path.join(temp_dir, "traj_0.pkl")
 
+        # i_vals = np.arange(-0.2, 0.2 + 0.01, 0.01)
+        # j_vals = np.arange(-0.3, 0.3 + 0.01, 0.01)
+        # k_vals = [0]
 
-        # i_vals = [-0.2, -0.15, -0.1, 0, 0.1, 0.15, 0.2]
-        # j_vals = [-0.2, -0.15, -0.1, 0, 0.1, 0.15, 0.2]
-        # k_vals = [0]
-        # i_vals = [-0.2, -0.16, -0.12, -0.08, -0.04, 0, 0.04, 0.08, 0.12, 0.16, 0.2]
-        # j_vals = [-0.3, -0.28, -0.24, -0.2, -0.16, -0.12, -0.08, -0.04, 0, 0.04, 0.08, 0.12, 0.16, 0.2, 0.24, 0.28, 0.3]
-        # k_vals = [0]
-        i_vals = np.arange(-0.2, 0.2 + 0.01, 0.01)
-        j_vals = np.arange(-0.3, 0.3 + 0.01, 0.01)
+        # make sample space smaller for example data, can change based on needs
+        i_vals = np.arange(-0.2, 0.2 + 0.1, 0.1)
+        j_vals = np.arange(-0.3, 0.3 + 0.15, 0.15)
         k_vals = [0]
 
-        # all_goal_features = {}
 
         for i in i_vals:
             for j in j_vals:
                 for k in k_vals:
 
                     offset = np.array([i, j, k])
-                    self.offset = offset
-
-                    # Round to reasonable decimal places
-                    self.offset = np.round(self.offset, 8)
-
-                    # Round small numbers to zero
-                    self.offset[np.abs(self.offset) < 1e-6] = int(0)
 
                     sampled_goals.append(offset)
                     # Create the clean key string as used when saving
-                    # key_str = '_'.join(['%g' % off for off in self.offset])
                     key_str = '_'.join([f"{off:.2f}".rstrip('0').rstrip('.') for off in [i, j, k]]) # no 0 after and all 0.1/0/0.02
-                    # all_traj_features = []
 
                     # already filtered
-                    # with open(f"/Users/anjiabei/Documents/research/features/sampled/sampled_{str(int(100*self.timing_ratio))}_z_0/{key_str}.pkl",'rb') as file:
-                    # with bz2.open(f"/Users/anjiabei/Documents/research/features/sampled/sampled_{str(int(100*self.timing_ratio))}_finer/{key_str}.pbz2",'rb') as file:
-                    with open(f"/home/aw797/palmer_scratch/sampled_{str(int(100*self.timing_ratio))}_finer/{key_str}.pkl",'rb') as file:
-                    # with open(f"/Users/anjiabei/Documents/research/features/sampled/sampled_{str(int(100*self.timing_ratio))}/{key_str}.pkl",'rb') as file:
+                    with open(f"../features/sampled/sampled_{str(int(100*self.timing_ratio))}_finer/{key_str}.pkl",'rb') as file:
                         traj_data = pickle.load(file)
                     test_data = [traj_data[i] for i in test_idx]
 
                     self.test_data = test_data
 
-                    pdfs = self.pwhere_inference(test_data, offset) # self.offset? close enough numbers?
-                    # pdfs = self.pwhere(test_data, offset) # where people leave the gripper
+                    # CHANGE HERE! phwere for using where people leave the gripper to infer goal
+                    # and phwere_inference for using where people grab the gripper to infer where they leave it and where the goal is
+                    if self.t == "grasp":
+                        pdfs = self.pwhere_inference(test_data, offset) # self.offset? close enough numbers?
+                    elif self.t == "release":
+                        pdfs = self.pwhere(test_data, offset) # where people leave the gripper
                     # pdfs_ground = self.pground(test_data, offset)
                     self.get_features(test_data)
                     self.input_data_all, self.target_data_all, self.corrected_time = self.stack_data()
                     p_uwhen = self.pwhen()  # List: one value per traj
-                    # input()
 
                     assert len(pdfs) == len(p_uwhen)
                     all_pdfs.append(pdfs)
-                    # all_pdfs_ground.append(pdfs_ground)
                     all_puwhens.append(p_uwhen)
         print("Done")
-        # input()            
 
         # Convert to NumPy arrays for easier manipulation
         all_pdfs = np.array(all_pdfs)          # Shape: (num_goals, num_trajectories)
@@ -179,9 +161,14 @@ class pgoal():
         for pair, info in res['pairwise'].items():
             print(f"Pred {pair[0]+1} vs Pred {pair[1]+1}: p={info['p_value']:.4f}, significant={info['significant']}")
 
-        with open(f"./KLDs_alpha/"+str(int(100*self.timing_ratio))+
-                  '_'+str(int(100*self.split))+'_shape_'+str(self.shape)+'_target_'+str(self.target)+'_'+str(int(self.rep))+'_alpha_'+str(int(100*self.alpha))+'.pkl', "wb") as f:
-            pickle.dump(res, f)
+        if self.t == "grasp":
+            with open(f"../results/KLDs_alpha/"+str(int(100*self.timing_ratio))+
+                    '_'+str(int(100*self.split))+'_shape_'+str(self.shape)+'_target_'+str(self.target)+'_'+str(int(self.rep))+'.pkl', "wb") as f:
+                pickle.dump(res, f)
+        elif self.t == "release":
+            with open(f"../results/KLDs_leaving_alpha/"+str(int(100*self.timing_ratio))+
+                    '_'+str(int(100*self.split))+'_shape_'+str(self.shape)+'_target_'+str(self.target)+'_'+str(int(self.rep))+'.pkl', "wb") as f:
+                pickle.dump(res, f)
         
     
     
@@ -189,8 +176,6 @@ class pgoal():
 
         selected_data = []
         for i in range(len(data)):
-            # if data[i]["features"] != False and (abs(u_where[0]) > 0.2 or abs(u_where[1]) > 0.2 or abs(u_where[2]) > 0.1):
-            # if data[i]["features"] != False and (abs(u_where[0]) < 0.2 and abs(u_where[1]) < 0.2 and abs(u_where[2]) < 0.1):
             if data[i]["features"] != False: # to skip the empty ones
                 selected_data.append(data[i])
         print(len(selected_data))
@@ -262,9 +247,6 @@ class pgoal():
             self.total_time.append(time)
             self.total_cor.append(cor)
 
-            # print(len(a1))
-
-            # input()
 
         self.total_a1_padded = pad_sequences(self.total_a1, padding='post', dtype='float32', value=-999.0) # to deferentiate from 0
         self.total_a2_padded = pad_sequences(self.total_a2, padding='post', dtype='float32', value=-999.0)
@@ -284,15 +266,6 @@ class pgoal():
 
     def stack_data(self):
 
-        # input_data = np.stack([self.total_v_padded, self.total_ps_padded, self.total_a1_padded, self.total_a3_padded, 
-        #                             self.total_dis_padded, self.total_a2_padded, self.total_acc_padded, self.total_legi_padded,
-        #                             self.total_jerk_padded, self.total_curv_padded], axis=-1) # num_datapoints, num_time, num_features
-        # input_data_all = input_data[:, :, 1:10]
-
-        # input_data = np.stack([self.total_ps_padded, self.total_a1_padded, self.total_a3_padded, 
-        #                             self.total_dis_padded, self.total_a2_padded, self.total_legi_padded,
-        #                             ], axis=-1) # num_datapoints, num_time, num_features
-        # input_data_all = input_data[:, :, :]
 
         input_data = np.stack([self.total_ps_padded, self.total_a1_padded, self.total_a3_padded, 
                                     self.total_dis_padded, self.total_a2_padded, self.total_legi_padded,
@@ -328,7 +301,6 @@ class pgoal():
         scaler.fit(valid_data)
 
         # Transform everything (this includes padded steps too)
-        # features_scaled = scaler.transform(reshaped_data)
         features_scaled = reshaped_data.copy()
         features_scaled[flat_mask == 1] = scaler.transform(reshaped_data[flat_mask == 1])
 
@@ -460,37 +432,14 @@ class pgoal():
                     layer.trainable = False
             print(f"✅ Layers up to index {freeze_until_layer} frozen")
 
-        # --- Compile with new optimizer for fine-tuning ---
-        # lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-        #     initial_learning_rate=learning_rate,
-        #     decay_steps=1000,
-        #     decay_rate=0.9
-        # )
-        # optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule, clipnorm=1.0)
-        # model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
-        
-        # model.summary()
+
         return model
 
     def pwhen(self):
 
         # p_when for each traj (N,) at the time of the correction
 
-        # model = load_model('./goal_infer_files/transformer_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'.keras')
-        # model = load_model('./goal_infer_files/transformer_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split)))
-        # model = TFSMLayer('./goal_infer_files/transformer_boltzmann_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split)), call_endpoint='serving_default')
-        # model = TFSMLayer('./goal_infer_files/repeats/transformer_all_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(0), call_endpoint='serving_default')
-        # model = TFSMLayer('./goal_infer_files/good_transformer/3', call_endpoint='serving_default')
-
-        model = self.build_and_load_transformer_for_finetune(model_weights_path=f'./model_weights/transformer_all_{str(int(100*self.timing_ratio))}_{str(int(self.rep))}.h5')
-
-        # features_scaled_valid = self.rescale_features_masked(self.input_data_all)
-
-        # features_scaled_tensor_valid = tf.convert_to_tensor(features_scaled_valid, dtype=tf.float32)
-        
-        # # y_pred = model.predict(features_scaled_valid)
-        # y_pred = np.squeeze(model(features_scaled_tensor_valid)["output_0"], axis = 2)
-        # # print(y_pred["output_0"].shape)
+        model = self.build_and_load_transformer_for_finetune(model_weights_path=f'../goal_infer_files/when_weights/model_weights/transformer_all_{str(int(100*self.timing_ratio))}_{str(int(self.rep))}.weights.h5')
 
         features_scaled_valid = self.rescale_features_masked(self.input_data_all)
         
@@ -560,7 +509,6 @@ class pgoal():
             # plt.tight_layout()
             # part_id = self.test_data[i]["participant_id"]
             # plt.title(f"participant {part_id}")
-            # plt.savefig(f"/Users/anjiabei/Documents/research/figures/goal_infer/p_when/{i}_{int(100*self.timing_ratio)}_{int(100*self.offset[0])}_{int(100*self.offset[1])}_{int(100*self.offset[2])}.png") 
             # plt.close()
             # # plt.show()
 
@@ -644,24 +592,18 @@ class pgoal():
         u_wheres = []
 
         for j in range(len(corrected_data)):
-            # actual_goal_index = int(corrected_data[j]["target"])
-            # shape = corrected_data[j]["shape"]
-            # target_pose = np.array(self.gs[shape][actual_goal_index])[:3] - offset
-            # center = np.array([0.65, 0, 0])
             center = np.array([self.gs[self.shape][0][0], 0, 0])
             target_pose = center - offset # dont know where the goal is but te abosolute position wrt offset off center
 
             correction_traj = np.array(corrected_data[j]["correction_pose_list"]).copy()
-            # u_where = correction_traj[0][:3] - target_pose  # relative pose to goal; where people grab the gripper
             u_where = correction_traj[-1][:3] - target_pose # where people leave the gripper
             u_wheres.append(u_where)
  
 
         u_wheres = np.array(u_wheres)  # Shape: (N, 3)
 
-        # gmm_3d = joblib.load('./goal_infer_files/gmm_uwhere_grabbing_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'.pkl')
-        # gmm_3d = joblib.load('./goal_infer_files/gmms/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
-        gmm_3d = joblib.load('./gmms/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
+
+        gmm_3d = joblib.load('../goal_infer_files/gmms/leaving/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
         pdf_vals = np.exp(gmm_3d.score_samples(u_wheres))
 
 
@@ -670,8 +612,7 @@ class pgoal():
     # -------- Inference --------
     def pwhere_inference(self, corrected_data, offset):
 
-        # save_path = f"/Users/anjiabei/Documents/research/natural-feedback/data_processing/gmm/goal_infer_files/where_infer/model_{str(int(100*self.timing_ratio))}_{str(int(100*self.split))}_{str(int(self.rep))}.pt"
-        save_path = f"./where_infer/model_{str(int(100*self.timing_ratio))}_{str(int(100*self.split))}_{str(int(self.rep))}.pt"
+        save_path = f"../goal_infer_files/where_infer/model_{str(int(100*self.timing_ratio))}_{str(int(100*self.split))}_{str(int(self.rep))}.pt"
 
         test_x, test_y = [], []
         pose_starts = []
@@ -682,8 +623,6 @@ class pgoal():
             pose_starts.append(pose_start)
             vel = np.array(np.array(d["correction_pose_list"][1][:3]) - np.array(d["correction_pose_list"][0][:3]), dtype=np.float32)
             pose_target = np.array(d["correction_pose_list"][-1][:3], dtype=np.float32)
-            # test_x.append(np.concatenate([pose_start, vel]))
-            # test_y.append(pose_target)
 
             # --- Change here ---
             # Input: zero pose start, keep vel
@@ -724,24 +663,13 @@ class pgoal():
             preds = preds_norm.numpy() * y_std + y_mean # predicted points
             y_true = test_y
 
-        # print("Inference completed. Predictions vs Ground Truth (20 random samples):")
-        # idxs = random.sample(range(len(test_x)), min(20, len(test_x)))
-
-        # print(f"{'Sample':<8}{'Prediction':<40}{'Ground Truth':<40}")
-        # print("-" * 90)
-        # for i in idxs:
-        #     pred_str = "[" + ", ".join(f"{v:.4f}" for v in preds[i]) + "]"
-        #     gt_str   = "[" + ", ".join(f"{v:.4f}" for v in y_true[i]) + "]"
-        #     print(f"{i:<8}{pred_str:<40}{gt_str:<40}")
 
         center = np.array([self.gs[self.shape][0][0], 0, 0])
         target_pose = center - offset # dont know where the goal is but te abosolute position wrt offset off center
         u_future = pose_starts + preds - target_pose # predicted points + the starts
         
         # PDF for predicted points
-        # gmm_3d = joblib.load('./goal_infer_files/gmm_uwhere_grabbing_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'.pkl')
-        # gmm_3d = joblib.load('./goal_infer_files/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'.pkl')
-        gmm_3d = joblib.load('./gmms/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
+        gmm_3d = joblib.load('../goal_infer_files/gmms/leaving/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
         pdf_vals = np.exp(gmm_3d.score_samples(u_future))
 
         return pdf_vals
@@ -749,7 +677,7 @@ class pgoal():
 
     
     
-    def gmm_xy_pdf_at_z0_centered(self,  n: int = 41, m: int = 61,
+    def gmm_xy_pdf_at_z0_centered(self,  n: int = 5, m: int = 5, # change dim here to match w sample space dim
                                 x_range=(-0.20, 0.20), y_range=(-0.30, 0.30),
                                 ) -> np.ndarray:
         """
@@ -766,38 +694,14 @@ class pgoal():
         Returns:
             pdf_values: Numpy array of shape (n*n, 1) with PDF values
         """
-        # centers = [-0.17, -0.055, 0.06, 0.18]
-        # center = np.array([0, centers[self.target]])
 
-        # gmm_3d = joblib.load('./goal_infer_files/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'.pkl')
-        # gmm_3d = joblib.load(f'./goal_infer_files/ground_truth/gmm_uwhere_model_ground_truth_{self.shape}.pkl')
-        gmm_3d = joblib.load(f'./ground_truth/gmm_uwhere_model_ground_truth_{self.shape}.pkl')
+        gmm_3d = joblib.load(f'../goal_infer_files/gmms/ground_truth/gmm_uwhere_model_ground_truth_{self.shape}.pkl')
 
-        # gmm_shifted = copy.deepcopy(gmm_3d)
-        # # gmm_shifted.means_ -= np.array([centers[self.target], 0.0, 0.0]) # y poses
-        # gmm_shifted.means_ -= np.array([self.gs[self.shape][self.target][1], 0.0, 0.0]) # y pose
-
-        # # --- Create grid ---
-        # # x = np.linspace(x_range[0], x_range[1], n) + center[0]  # rows
-        # # y = np.linspace(y_range[0], y_range[1], n) + center[1]  # columns
-        # x = np.linspace(x_range[0], x_range[1], n)   # rows
-        # y = np.linspace(y_range[0], y_range[1], m)   # columns
-        # xx, yy = np.meshgrid(y, x)  # meshgrid: rows correspond to x
-
-        # # --- Flatten grid for GMM evaluation ---
-        # grid_points = np.column_stack([xx.ravel(), yy.ravel(), np.zeros(n*m)])
-
-        # # --- Evaluate PDF ---
-        # pdf_values = np.exp(gmm_shifted.score_samples(grid_points))
-        # pdf_values /= pdf_values.sum()  # ensure sum=1
-
+   
         gmm_shifted = copy.deepcopy(gmm_3d)
-        # gmm_shifted.means_ -= np.array([centers[self.target], 0.0, 0.0]) # y poses
         gmm_shifted.means_ -= np.array([0.0, self.gs[self.shape][self.target][1], 0.0]) # y pose
 
         # --- Create grid ---
-        # x = np.linspace(x_range[0], x_range[1], n) + center[0]  # rows
-        # y = np.linspace(y_range[0], y_range[1], n) + center[1]  # columns
         x = np.linspace(x_range[0], x_range[1], n)   # rows
         y = np.linspace(y_range[0], y_range[1], m)   # columns
         xx, yy = np.meshgrid(x, y)  # meshgrid: rows correspond to x
@@ -948,7 +852,8 @@ if __name__ == "__main__":
     parser.add_argument('-sh','--shape', type = str)
     parser.add_argument('-r','--repeat', type = int)
     parser.add_argument('-a','--alpha', type = float)
+    parser.add_argument('-t','--type', type = str) # use grasp or release poses to infer goal poses
 
     args = parser.parse_args()
 
-    pg = pgoal(timing_ratio=args.timing_ratio, split = args.split, target = args.target, shape = args.shape, rep = args.repeat, alpha = args.alpha)
+    pg = pgoal(timing_ratio=args.timing_ratio, split = args.split, target = args.target, shape = args.shape, rep = args.repeat, alpha = args.alpha, t = args.type)

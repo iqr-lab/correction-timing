@@ -53,7 +53,7 @@ class correlation():
         """
 
         # goal positions
-        with open('../../experiment/config/target_position.yaml','r') as file:
+        with open('../config/target_position.yaml','r') as file:
 
             self.target_position = yaml.safe_load(file)
             
@@ -69,7 +69,7 @@ class correlation():
         self.gs = {'circle':c_gs,'square':s_gs,'triangle':t_gs,'rectangle':r_gs}
 
         # load the data
-        with open('/Users/anjiabei/Documents/research/rescaled_traj.pkl', 'rb') as file:
+        with open('../config/example_data_rescaled.pkl', 'rb') as file:
             self.training_data = pickle.load(file)
         print(len(self.training_data))
 
@@ -334,7 +334,7 @@ class correlation():
 
 
         # -- Setup --
-        results_file = "dtw_endpoint_results.csv"
+        results_file = "../results/dtw_endpoint_results.csv"
         done_pairs = set()
 
         # Load already computed results (if any)
@@ -388,7 +388,7 @@ class correlation():
 
     def read_csvfile(self):
         # Load the CSV
-        df = pd.read_csv("./dtw_endpoint_results.csv")
+        df = pd.read_csv("../results/dtw_endpoint_results.csv")
 
         # Access individual columns
         i_values = df["i"]

@@ -595,7 +595,7 @@ class pgoal():
     # -------- Inference --------
     def pwhere_inference(self, corrected_data, offset):
 
-        save_path = f"./goal_infer_files/where_infer/model_{str(int(100*self.timing_ratio))}_{str(int(100*self.split))}_{str(int(self.rep))}.pt"
+        save_path = f"../goal_infer_files/where_infer/model_{str(int(100*self.timing_ratio))}_{str(int(100*self.split))}_{str(int(self.rep))}.pt"
 
         test_x, test_y = [], []
         pose_starts = []
@@ -648,7 +648,7 @@ class pgoal():
         target_pose = center - offset # dont know where the goal is but te abosolute position wrt offset off center
         u_future = pose_starts + preds - target_pose # predicted points + the starts
         
-        gmm_3d = joblib.load('./goal_infer_files/gmms/leaving/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
+        gmm_3d = joblib.load('../goal_infer_files/gmms/leaving/gmm_uwhere_leaving_'+str(int(100*self.timing_ratio))+'_'+str(int(100*self.split))+'_'+str(int(self.rep))+'.pkl')
         pdf_vals = np.exp(gmm_3d.score_samples(u_future))
 
         return pdf_vals
@@ -656,7 +656,7 @@ class pgoal():
 
     
     
-    def gmm_xy_pdf_at_z0_centered(self,  n: int = 41, m: int = 61,
+    def gmm_xy_pdf_at_z0_centered(self,  n: int = 5, m: int = 5, # change dim here to match w sample space dim
                                 x_range=(-0.20, 0.20), y_range=(-0.30, 0.30),
                                 ) -> np.ndarray:
         """
@@ -674,7 +674,7 @@ class pgoal():
             pdf_values: Numpy array of shape (n*n, 1) with PDF values
         """
 
-        gmm_3d = joblib.load(f'./goal_infer_files/gmms/ground_truth/gmm_uwhere_model_ground_truth_{self.shape}.pkl')
+        gmm_3d = joblib.load(f'../goal_infer_files/gmms/ground_truth/gmm_uwhere_model_ground_truth_{self.shape}.pkl')
 
 
         gmm_shifted = copy.deepcopy(gmm_3d)
@@ -756,7 +756,7 @@ class pgoal():
             }
 
         return {
-            'all_kls': kl_per_traj,
+            'all_kls': kl_per_traj, # save all the kls for each traj
             'mean_kls': mean_kls,
             'ci': ci_list,
             'kl_per_traj': kl_per_traj,
@@ -829,7 +829,7 @@ if __name__ == "__main__":
     parser.add_argument('-tg','--target', type = int)
     parser.add_argument('-sh','--shape', type = str)
     parser.add_argument('-r','--repeat', type = int)
-    parser.add_argument('-t','--type', type = float) # use grasp or release poses to infer goal poses
+    parser.add_argument('-t','--type', type = str) # use grasp or release poses to infer goal poses
 
     args = parser.parse_args()
 

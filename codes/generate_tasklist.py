@@ -12,8 +12,9 @@ r_vals = np.arange(-0.3, 0.3 + 0.15, 0.15)
 with open("tasklist_feature_offset.sh", "w") as f:
     for q in q_vals:
         for r in r_vals:
-            cmd = f"python3 extract_features_xysampling.py -tr 1 -x {q:.2f} -y {r:.2f};\n" # change -tr from 0.7 to 1; formatting for floats
-            f.write(cmd)
+            for tr in [0.7, 0.8, 0.9, 1]:
+                cmd = f"python3 extract_features_xysampling.py -tr {tr} -x {q:.2f} -y {r:.2f};\n" # change -tr from 0.7 to 1; formatting for floats
+                f.write(cmd)
 
 print("Task list saved to tasklist_feature_offset.sh")
 
