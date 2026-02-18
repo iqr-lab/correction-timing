@@ -3,4 +3,6 @@
 source/data_keys.pkl
 source/corl_data.pkl
 source/rescaled_traj.pkl
+.DS_Store
+**/.DS_Store
 
